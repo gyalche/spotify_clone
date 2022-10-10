@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { reducerCases } from '../utils/constant';
 import { useStateProvider } from '../utils/StateProvider';
@@ -7,7 +7,22 @@ import Body from './Body';
 import Footer from './Footer';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+
 const Spotify = () => {
+  const bodyRef = useRef();
+  const [navBackground, setNavBackground] = useState(false);
+  const [headerBackground, setHeaderBackground] = useState(false);
+
+  const bodyScrolled = () => {
+    bodyRef.current.scrollTop >= 30
+      ? setNavBackground(true)
+      : setNavBackground(false);
+
+    bodyRef.current.scrollTop >= 68
+      ? setHeaderBackground(true)
+      : setHeaderBackground(false);
+  };
+
   const [{ token }, dispatch] = useStateProvider();
   useEffect(() => {
     const getUserInfo = async () => {
@@ -17,7 +32,7 @@ const Spotify = () => {
           'Content-Type': 'application/json',
         },
       });
-      console.log(data);
+      // console.log(data);
       const userInfo = {
         userId: data.id,
         userName: data.display_name,
@@ -33,10 +48,10 @@ const Spotify = () => {
     <Container>
       <div className="spotify__body">
         <Sidebar />
-        <div className="body">
-          <Navbar />
+        <div className="body" ref={bodyRef} onScroll={bodyScrolled}>
+          <Navbar navBackground={navBackground} />
           <div className="body__contents">
-            <Body />
+            <Body headerBackground={headerBackground} />
           </div>
         </div>
       </div>
